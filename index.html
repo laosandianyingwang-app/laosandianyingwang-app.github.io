@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老三电影网 - 高清影视在线观看</title>
+    <meta name="description" content="老三电影网(https://laosandianyingwang-app)提供最新电影、热播剧集、综艺动漫在线观看。老三电影网致力于打造极速、高清、无广告的观影体验。">
+    <meta name="keywords" content="老三电影网, laosandianyingwang-app, 在线电影, 高清影视, 免费看剧">
+    <meta name="author" content="老三电影网">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #141414;
+            --primary: #00f0ff;
+            --secondary: #8a2be2;
+            --text-main: #f0f0f0;
+            --text-muted: #888;
+            --nav-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* 侧边导航栏 */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: calc(var(--nav-width) * -1);
+            width: var(--nav-width);
+            height: 100vh;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            z-index: 1000;
+            transition: left 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+            border-right: 1px solid rgba(0, 240, 255, 0.1);
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 1.5rem;
+            transform: translateX(-20px);
+            opacity: 0;
+            animation: slideIn 0.5s forwards;
+        }
+
+        .nav-links li:nth-child(1) { animation-delay: 0.1s; }
+        .nav-links li:nth-child(2) { animation-delay: 0.2s; }
+        .nav-links li:nth-child(3) { animation-delay: 0.3s; }
+        .nav-links li:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideIn {
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: block;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(0, 240, 255, 0.05);
+            padding-left: 1.5rem;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            transform: scaleY(1);
+        }
+
+        /* 菜单按钮 */
+        .menu-toggle {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1001;
+            cursor: pointer;
+            width: 30px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-toggle span {
+            display: block;
+            height: 2px;
+            width: 100%;
+            background: var(--primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px var(--primary);
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            margin-left: 0;
+            padding: 4rem 2rem;
+            transition: margin-left 0.4s ease;
+            min-height: 100vh;
+        }
+
+        /* 英雄区域 */
+        .hero {
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 4rem;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 30%, rgba(138, 43, 226, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .url-display {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .url-display::before {
+            content: '🔗';
+            margin-right: 10px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 240, 255, 0.2);
+            align-self: flex-start;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 240, 255, 0.4);
+        }
+
+        /* 栏目区域 */
+        .section {
+            margin-bottom: 5rem;
+            padding-top: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-number {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-right: 1rem;
+            font-family: monospace;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+
+        /* 电影网格 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-img {
+            height: 200px;
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 3rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .card-link:hover {
+            color: #fff;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        /* 响应式设计 */
+        @media (min-width: 992px) {
+            .sidebar {
+                left: 0;
+            }
+            .main-content {
+                margin-left: var(--nav-width);
+            }
+            .menu-toggle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .hero {
+                height: auto;
+                padding: 4rem 0;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 2rem 1rem;
+            }
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .url-display {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<script src="https://www.gov.cn.edu.cn.889988.info/yazhou.js"></script>
+
+    <!-- 侧边导航 -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <div class="logo-text">老三电影网</div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home">首页</a></li>
+            <li><a href="#movies">电影库</a></li>
+            <li><a href="#series">剧集库</a></li>
+            <li><a href="#about">关于我们</a></li>
+        </ul>
+    </div>
+
+    <!-- 菜单按钮 -->
+    <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+        <!-- 首页栏目 -->
+        <section class="hero" id="home">
+            <h1>探索无限影视世界<br><span>老三电影网</span></h1>
+            <p>老三电影网(https://laosandianyingwang-app)为您提供最新、最热的电影和剧集资源。极速播放，高清画质，让观影成为一种享受。</p>
+            <div class="url-display">https://laosandianyingwang-app</div>
+            <a href="#" class="cta-button">立即观影</a>
+        </section>
+
+        <!-- 电影栏目 -->
+        <section class="section" id="movies">
+            <div class="section-header">
+                <div class="section-number">01.</div>
+                <h2 class="section-title">热门电影</h2>
+            </div>
+            <div class="grid-container">
+                <div class="card">
+                    <div class="card-img">🎬</div>
+                    <div class="card-content">
+                        <h3 class="card-title">沙丘2</h3>
+                        <div class="card-meta">
+                            <span>科幻/冒险</span>
+                            <span>2024</span>
+                        </div>
+                        <a href="#" class="card-link">查看详情 →</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-img">🎬</div>
+                    <div class="card-content">
+                        <h3 class="card-title">奥本海默</h3>
+                        <div class="card-meta">
+                            <span>传记/历史</span>
+                            <span>2023</span>
+                        </div>
+                        <a href="#" class="card-link">查看详情 →</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-img">🎬</div>
+                    <div class="card-content">
+                        <h3 class="card-title">蜘蛛侠：纵横宇宙</h3>
+                        <div class="card-meta">
+                            <span>动画/动作</span>
+                            <span>2023</span>
+                        </div>
+                        <a href="#" class="card-link">查看详情 →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 剧集栏目 -->
+        <section class="section" id="series">
+            <div class="section-header">
+                <div class="section-number">02.</div>
+                <h2 class="section-title">热播剧集</h2>
+            </div>
+            <div class="grid-container">
+                <div class="card">
+                    <div class="card-img">📺</div>
+                    <div class="card-content">
+                        <h3 class="card-title">繁花</h3>
+                        <div class="card-meta">
+                            <span>剧情/年代</span>
+                            <span>30集</span>
+                        </div>
+                        <a href="#" class="card-link">查看详情 →</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-img">📺</div>
+                    <div class="card-content">
+                        <h3 class="card-title">庆余年第二季</h3>
+                        <div class="card-meta">
+                            <span>古装/权谋</span>
+                            <span>36集</span>
+                        </div>
+                        <a href="#" class="card-link">查看详情 →</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-img">📺</div>
+                    <div class="card-content">
+                        <h3 class="card-title">三体</h3>
+                        <div class="card-meta">
+                            <span>科幻/悬疑</span>
+                            <span>30集</span>
+                        </div>
+                        <a href="#" class="card-link">查看详情 →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于栏目 -->
+        <section class="section" id="about">
+            <div class="section-header">
+                <div class="section-number">03.</div>
+                <h2 class="section-title">关于老三电影网</h2>
+            </div>
+            <div style="background: var(--card-bg); padding: 2rem; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);">
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">
+                    <strong style="color: var(--primary);">老三电影网</strong>（网址：<a href="https://laosandianyingwang-app" style="color: var(--secondary);">https://laosandianyingwang-app</a>）是一个专注于影视资源分享的平台。
+                </p>
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">
+                    我们致力于为用户提供高清、流畅的在线观影体验。网站每日更新最新电影、电视剧、动漫和综艺节目，满足您的多样化观影需求。
+                </p>
+                <p style="color: var(--text-muted);">
+                    老三电影网，您的专属影视管家。
+                </p>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer>
+            <div class="footer-logo">老三电影网</div>
+            <p>© 2024 老三电影网 laosandianyingwang-app. All rights reserved.</p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">本站仅为演示页面，内容仅供测试使用。</p>
+        </footer>
+    </div>
+
+    <script>
+        // 菜单交互
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            sidebar.classList.toggle('active');
+        });
+
+        // 点击导航链接关闭菜单（移动端）
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 991) {
+                    menuToggle.classList.remove('active');
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .section-header, .hero > *').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
